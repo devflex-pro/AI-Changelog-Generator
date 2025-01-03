@@ -1,0 +1,17 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - unused
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+  disable:
+    - godox
+    - dupl
+issues:
+  exclude-rules:
+    - linters:
+        - errcheck
+      text: "http.Get"
