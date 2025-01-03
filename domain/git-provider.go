@@ -2,6 +2,10 @@ package domain
 
 import "context"
 
+const (
+	GitHub = "github"
+)
+
 type Commit struct {
 	Hash     string
 	Author   string
