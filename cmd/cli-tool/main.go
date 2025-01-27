@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"net/url"
 
 	clitool "github.com/devflex-pro/AI-Changelog-Generator/cli-tool"
 	"github.com/devflex-pro/AI-Changelog-Generator/domain"
@@ -11,22 +13,18 @@ import (
 
 func main() {
 
-	gitProviderName := *flag.String(
-		"provider",
-		"github",
-		"The name of the provider (e.g., github, gitlab)")
-	accessToken := *flag.String(
+	accessToken := flag.String(
 		"token",
 		"",
 		"Personal access token for the selected provider (required)")
-	repoURL := *flag.String(
+	repoURL := flag.String(
 		"repo",
 		"",
 		"Repository URL for the selected provider (required)")
 
 	flag.Parse()
-
-	if accessToken == "" || repoURL == "" {
+	fmt.Printf("Repo: %s, Token: %s\n", *repoURL, *accessToken)
+	if *accessToken == "" || *repoURL == "" {
 		log.Fatal("Both -token and -repo flags are required")
 	}
 
@@ -35,11 +33,19 @@ func main() {
 		err         error
 	)
 
-	switch gitProviderName {
+	parsedRepoURL, err := url.Parse(*repoURL)
+	if err != nil {
+		log.Fatalf("Parse repo URl failed: %s", err.Error())
+	}
+
+	switch parsedRepoURL.Hostname() {
 	case domain.GitHub:
-		gitProvider, err = git_provider_github.New(accessToken, repoURL)
+		gitProvider, err = git_provider_github.New(*accessToken, *repoURL)
+		if err != nil {
+			log.Fatalf("GitHub provider init failed: %s", err.Error())
+		}
 	default:
-		log.Fatalf("Unsupported git provider: %s", gitProviderName)
+		log.Fatalf("Unsupported git provider: %s", parsedRepoURL.Hostname())
 	}
 	if err != nil {
 		log.Fatalf("Set git provider failed: %s", err.Error())

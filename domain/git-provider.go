@@ -3,7 +3,7 @@ package domain
 import "context"
 
 const (
-	GitHub = "github"
+	GitHub = "github.com"
 )
 
 type Commit struct {
